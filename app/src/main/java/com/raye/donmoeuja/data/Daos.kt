@@ -23,6 +23,15 @@ interface EntryDao {
         """
         SELECT e.*, c.name AS categoryName FROM entries e
         LEFT JOIN categories c ON e.categoryId = c.id
+        ORDER BY e.occurredAt DESC, e.createdAt DESC, e.id DESC
+        """
+    )
+    fun observeAll(): Flow<List<EntryWithCategory>>
+
+    @Query(
+        """
+        SELECT e.*, c.name AS categoryName FROM entries e
+        LEFT JOIN categories c ON e.categoryId = c.id
         WHERE e.id = :id
         """
     )

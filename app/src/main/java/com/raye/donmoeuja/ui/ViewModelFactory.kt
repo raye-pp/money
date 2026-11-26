@@ -9,6 +9,7 @@ import com.raye.donmoeuja.AppContainer
 import com.raye.donmoeuja.DonApp
 import com.raye.donmoeuja.ui.detail.DetailViewModel
 import com.raye.donmoeuja.ui.edit.EditViewModel
+import com.raye.donmoeuja.ui.history.HistoryViewModel
 import com.raye.donmoeuja.ui.home.HomeViewModel
 import com.raye.donmoeuja.ui.settings.SettingsViewModel
 import com.raye.donmoeuja.ui.stats.StatsViewModel
@@ -21,6 +22,7 @@ object AppViewModels {
         initializer { HomeViewModel(container().repository, container().settings) }
         initializer { EditViewModel(createSavedStateHandle(), container().repository) }
         initializer { DetailViewModel(createSavedStateHandle(), container().repository) }
+        initializer { HistoryViewModel(container().repository) }
         initializer { StatsViewModel(container().repository, container().settings) }
         initializer { SettingsViewModel(container().repository) }
     }

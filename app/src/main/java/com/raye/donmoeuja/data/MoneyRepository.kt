@@ -31,6 +31,9 @@ class MoneyRepository(
         return entryDao.observeInRange(r.first, r.last)
     }
 
+    /** 전체 내역 (날짜 최신순) — 기록 탭 */
+    val allEntries: Flow<List<EntryWithCategory>> = entryDao.observeAll()
+
     fun entry(id: Long): Flow<EntryWithCategory?> = entryDao.observeById(id)
 
     suspend fun getEntry(id: Long): Entry? = entryDao.getById(id)

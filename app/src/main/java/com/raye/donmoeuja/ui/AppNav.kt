@@ -3,6 +3,7 @@ package com.raye.donmoeuja.ui
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
@@ -26,6 +27,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.raye.donmoeuja.ui.detail.DetailScreen
 import com.raye.donmoeuja.ui.edit.EditScreen
+import com.raye.donmoeuja.ui.history.HistoryScreen
 import com.raye.donmoeuja.ui.home.HomeScreen
 import com.raye.donmoeuja.ui.settings.SettingsScreen
 import com.raye.donmoeuja.ui.stats.StatsScreen
@@ -33,6 +35,7 @@ import com.raye.donmoeuja.ui.theme.AccentSoft
 
 object Routes {
     const val HOME = "home"
+    const val HISTORY = "history"
     const val STATS = "stats"
     const val SETTINGS = "settings"
     const val EDIT = "edit?entryId={entryId}"
@@ -46,6 +49,7 @@ private data class Tab(val route: String, val label: String, val icon: ImageVect
 
 private val tabs = listOf(
     Tab(Routes.HOME, "홈", Icons.Filled.Home),
+    Tab(Routes.HISTORY, "기록", Icons.Filled.DateRange),
     Tab(Routes.STATS, "통계", Icons.AutoMirrored.Filled.List),
     Tab(Routes.SETTINGS, "설정", Icons.Filled.Settings),
 )
@@ -89,6 +93,9 @@ fun DonMoeujaApp(navController: NavHostController = rememberNavController()) {
                     onAdd = { navController.navigate(Routes.edit()) },
                     onOpenEntry = { navController.navigate(Routes.detail(it)) },
                 )
+            }
+            composable(Routes.HISTORY) {
+                HistoryScreen(onOpenEntry = { navController.navigate(Routes.detail(it)) })
             }
             composable(Routes.STATS) { StatsScreen() }
             composable(Routes.SETTINGS) { SettingsScreen() }

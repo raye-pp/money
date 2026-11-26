@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
@@ -22,6 +25,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.ui.text.style.TextOverflow
+import com.raye.donmoeuja.data.EntryWithCategory
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDateRangePickerState
@@ -244,5 +250,48 @@ fun EmptyMessage(text: String, modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(text, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+/** 목록 한 건 (2줄): 윗줄 구분 · 요약 · 금액 / 아랫줄 날짜 · 카테고리 · 결제수단 · 삭제 */
+@Composable
+fun EntryListRow(item: EntryWithCategory, onClick: () -> Unit, onDelete: (() -> Unit)? = null) {
+    val e = item.entry
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 10.dp, horizontal = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            TypeChip(e.type)
+            Spacer(Modifier.width(8.dp))
+            Text(
+                e.summary.ifBlank { "(요약 없음)" },
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
+            )
+            Text(signedAmount(e.type, e.amount), fontWeight = FontWeight.Bold)
+        }
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.heightIn(min = 32.dp)) {
+            val meta = listOf(
+                e.occurredAt.toLocalDateTime().toLocalDate().short(),
+                item.categoryName ?: UNCATEGORIZED,
+                e.paymentMethod?.label ?: "—",
+            ).joinToString(" · ")
+            Text(
+                meta,
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.weight(1f),
+            )
+            if (onDelete != null) {
+                TextButton(onClick = onDelete, contentPadding = PaddingValues(horizontal = 8.dp)) {
+                    Text("삭제", color = MaterialTheme.colorScheme.error, fontSize = 14.sp)
+                }
+            }
+        }
     }
 }

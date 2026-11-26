@@ -19,6 +19,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -48,29 +50,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.raye.donmoeuja.data.Entry
-import com.raye.donmoeuja.data.EntryWithCategory
 import com.raye.donmoeuja.ui.AppViewModels
 import com.raye.donmoeuja.ui.ConfirmDialog
 import com.raye.donmoeuja.ui.EmptyMessage
+import com.raye.donmoeuja.ui.EntryListRow
 import com.raye.donmoeuja.ui.LabelValueRow
 import com.raye.donmoeuja.ui.PeriodPickerDialog
 import com.raye.donmoeuja.ui.SectionTitle
 import com.raye.donmoeuja.ui.ThousandsTransformation
-import com.raye.donmoeuja.ui.TypeChip
-import com.raye.donmoeuja.ui.UNCATEGORIZED
 import com.raye.donmoeuja.ui.formatWon
 import com.raye.donmoeuja.ui.sanitizeAmount
 import com.raye.donmoeuja.ui.short
-import com.raye.donmoeuja.ui.signedAmount
 import com.raye.donmoeuja.ui.theme.Accent
 import com.raye.donmoeuja.ui.theme.Ink
-import com.raye.donmoeuja.ui.toLocalDateTime
 
 @Composable
 fun HomeScreen(
@@ -116,6 +113,8 @@ fun HomeScreen(
                 SummaryCard(
                     state = s,
                     onPeriodClick = { showPeriodPicker = true },
+                    onPrev = { viewModel.shiftPeriod(-1) },
+                    onNext = { viewModel.shiftPeriod(1) },
                     onToggle = { viewModel.setCollapsed(!s.settings.summaryCollapsed) },
                     onBudgetClick = { showBudgetDialog = true },
                 )
@@ -127,7 +126,7 @@ fun HomeScreen(
                 item { EmptyMessage("이 기간에 입력한 내역이 없어요.\n오른쪽 위 [추가하기]로 시작해 보세요.") }
             } else {
                 items(s.entries, key = { it.entry.id }) { item ->
-                    EntryRow(
+                    EntryListRow(
                         item = item,
                         onClick = { onOpenEntry(item.entry.id) },
                         onDelete = { pendingDelete = item.entry },
@@ -168,6 +167,8 @@ fun HomeScreen(
 private fun SummaryCard(
     state: HomeUiState,
     onPeriodClick: () -> Unit,
+    onPrev: () -> Unit,
+    onNext: () -> Unit,
     onToggle: () -> Unit,
     onBudgetClick: () -> Unit,
 ) {
@@ -181,15 +182,21 @@ private fun SummaryCard(
         Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("기간", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Spacer(Modifier.width(12.dp))
+                IconButton(onClick = onPrev) {
+                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "이전 기간")
+                }
                 Text(
                     "${settings.start.short()} ~ ${settings.end.short()}",
                     fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
                     modifier = Modifier
                         .weight(1f)
                         .clickable(onClick = onPeriodClick)
                         .padding(vertical = 8.dp),
                 )
+                IconButton(onClick = onNext) {
+                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "다음 기간")
+                }
                 IconButton(onClick = onToggle) {
                     Icon(
                         if (collapsed) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp,
@@ -226,48 +233,6 @@ private fun SummaryCard(
                         else MaterialTheme.colorScheme.onSurface,
                     )
                 }
-            }
-        }
-    }
-}
-
-@Composable
-private fun EntryRow(item: EntryWithCategory, onClick: () -> Unit, onDelete: () -> Unit) {
-    val e = item.entry
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 10.dp, horizontal = 4.dp),
-        verticalArrangement = Arrangement.spacedBy(2.dp),
-    ) {
-        // 윗줄: 구분 · 요약 · 금액
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            TypeChip(e.type)
-            Spacer(Modifier.width(8.dp))
-            Text(
-                e.summary.ifBlank { "(요약 없음)" },
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f),
-            )
-            Text(signedAmount(e.type, e.amount), fontWeight = FontWeight.Bold)
-        }
-        // 아랫줄: 날짜 · 카테고리 · 결제수단 · 삭제
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            val meta = listOf(
-                e.occurredAt.toLocalDateTime().toLocalDate().short(),
-                item.categoryName ?: UNCATEGORIZED,
-                e.paymentMethod?.label ?: "—",
-            ).joinToString(" · ")
-            Text(
-                meta,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.weight(1f),
-            )
-            TextButton(onClick = onDelete, contentPadding = PaddingValues(horizontal = 8.dp)) {
-                Text("삭제", color = MaterialTheme.colorScheme.error, fontSize = 14.sp)
             }
         }
     }
