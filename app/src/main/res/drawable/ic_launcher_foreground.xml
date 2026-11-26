@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- coin -->
+    <path
+        android:fillColor="#FF22252B"
+        android:pathData="M54,28a26,26 0,1 1,0 52a26,26 0,1 1,0 -52z" />
+    <path
+        android:fillColor="#FFF2B33D"
+        android:pathData="M54,33a21,21 0,1 1,0 42a21,21 0,1 1,0 -42z" />
+    <!-- won sign (simplified W with two bars) -->
+    <path
+        android:fillColor="#FF22252B"
+        android:pathData="M41,43h5l3.5,17 3.5,-17h2l3.5,17 3.5,-17h5l-6.5,24h-3.5l-3,-14 -3,14h-3.5z" />
+    <path
+        android:fillColor="#FF22252B"
+        android:pathData="M38,50h32v2.5h-32zM38,55h32v2.5h-32z" />
+</vector>
